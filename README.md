@@ -36,3 +36,8 @@ Once installed all the resources you can launch something like `k port-forward $
 an check if the application works.
 I also prefer to check consitency of the manifest I release so for this I'd like to use `kubeval` docker image in order 
 to be secure that the manifest are correctly valorized.
+
+The Codebuild project requires a service role to do its job, but you don't need to define it properly.
+Can you think of the policies it must have to complete its build and deployment task?
+
+Please check the file under `aws` folder, the IAM Role with all the relative policies are defined there. 
