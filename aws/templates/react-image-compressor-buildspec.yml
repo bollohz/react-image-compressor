@@ -1,0 +1,35 @@
+version: 0.2
+phases:
+  install:
+    commands:
+      - apt-get update && apt-get -y install build-essentials git jq python3-pip python3-dev && pip3 install --upgrade awscli
+      - curl -sS -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.14.6/2019-08-22/bin/linux/amd64/kubectl
+      - chmod +x ./kubectl  && mv ./kubectl /usr/local/bin/kubectl
+      - curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+      - chmod 700 get_helm.sh && ./get-helm.sh
+      - mv ./helm /usr/local/bin/helm
+      - alias helm3=helm
+  pre-build:
+    commands:
+      - $(aws ecr get-login --no-include-email)
+      - export KUBECONFIG=$HOME/.kube/config
+      - make test
+      - make chart-test
+      - TAG=$(git log $REPOSITORY_BRANCH | awk '{print substr($0,1,40);exit}' )
+      - sed -i 's/IMAGE_TAG/$TAG/' ./Makefile
+  build:
+    commands:
+      - make image-prod
+  post-build:
+    commands:
+      - aws eks update-kubeconfig --name $TARGET_CLUSTER --role-arn $KUBECTL_ROLE_ARN
+      - kubectl apply -f helm/react-image-compressor/out.yaml
+      - printf '{"version":"%s"}' $TAG > buildartifact.json
+  artifacts:
+    files:
+      - buildartifact.json
+      - helm/react-image-compressor/out.yaml
+
+
+
+

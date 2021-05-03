@@ -15,23 +15,24 @@ A simple image compressor built with [react](https://reactjs.org/) and [browser-
 - React Bootstrap
 - Browser Image Compression
 
+## Prerequisites
+
+- MAKE GNU active on your laptop
+- Docker installed
+- Helm3 installed, if not please check the `out.yaml` file that contains k8s manifests
+
 ## Development
+1. To run local environment please run `make start`.
+2. To test helm chart + manifest file, please run `make chart-test`
+3. To create the image for production environment please run `make image-prod`
+4. To apply helm3 chart directly please run `make chart-install -- -f {relativepath}/values.yaml`
+    example `make chart-install -- -f helm/react-image-compressor/values.yaml`
 
-1. Clone the repository and change directory.
+## Questions
+How would you try it in your local environment?
 
-```
-git clone https://github.com/RaulB-masai/react-image-compressor.git
-cd react-image-compressor
-```
-
-2. Install npm dependencies
-
-```
-npm install
-```
-
-3. Run the app locally.
-
-```
-npm start
-```
+Probably the best way to try it is in with something like KinD or Minikube.
+Once installed all the resources you can launch something like `k port-forward ${application}` pointing to the service 
+an check if the application works.
+I also prefer to check consitency of the manifest I release so for this I'd like to use `kubeval` docker image in order 
+to be secure that the manifest are correctly valorized.
